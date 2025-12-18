@@ -83,6 +83,10 @@ allure-combine ./some/path/to/allure/generated/folder --remove-temp-files
 allure-combine ./some/path/to/allure/generated/folder --ignore-utf8-errors
 ```
 
+6) If the text content of generated HTML presents formatting issues, try this option:
+```bash
+allure-combine ./some/path/to/allure/generated/folder --disable-tags-escaping
+```
 
 ## Import and use in python code
 
@@ -118,12 +122,18 @@ combine_allure(
     ignore_utf8_errors=True
 )
 
+# 6) If the text content of generated HTML presents formatting issues, try this option:
+combine_allure(
+    "./some/path/to/allure/generated/folder",
+    disable_tags_escaping=True
+)
+
 
 ```
 
 ## Integration tests
 
-The repository contains Docker-based integration tests in `integration_tests/` that validate `allure-combine` CLI flows (including `--dest`, `--auto-create-folders`, `--remove-temp-files`, and `--ignore-utf8-errors`).
+The repository contains Docker-based integration tests in `integration_tests/` that validate `allure-combine` CLI flows (including `--dest`, `--auto-create-folders`, `--remove-temp-files`, `--ignore-utf8-errors`, and `--disable-tags-escaping`).
 
 Run full integration flow (requires Docker): build image, run tests, generate `complete.html` for each CLI variant, and validate every generated HTML in headless Chromium via Playwright.
 

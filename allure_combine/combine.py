@@ -28,7 +28,7 @@ sep = os.sep
 re_sep = os.sep if os.sep == "/" else r"\\"
 
 
-def combine_allure(folder, dest_folder=None, remove_temp_files=False, auto_create_folders=False, ignore_utf8_errors=False):
+def combine_allure(folder, dest_folder=None, remove_temp_files=False, auto_create_folders=False, ignore_utf8_errors=False, disable_tags_escaping=False):
     """
     Read all files,
     create server.js,
@@ -199,7 +199,12 @@ def combine_allure(folder, dest_folder=None, remove_temp_files=False, auto_creat
                 f.write(f""" "{url}": "{content}", \n""")
             else:
                 content = d['content'].replace("\\", "\\\\").replace('"', '\\"')\
-                    .replace("\n", "\\n").replace("<", "&lt;").replace(">", "&gt;")
+                    .replace("\n", "\\n")
+                
+                if not disable_tags_escaping:
+                    content = content.replace("<", "&lt;").replace(">", "&gt;")
+                else:
+                    content = content.replace("<", "\\u003c").replace(">", "\\u003e")
 
                 f.write(f""" "{url}": "{content}", \n""")
         f.write("};\n")
@@ -305,9 +310,12 @@ def main():
                         help="Whether auto create dest folders or not when folder does not exist. Default is false.")
     parser.add_argument("--ignore-utf8-errors", action="store_true",
                         help="If test files does contain some broken unicode, decode errors would be ignored")
+    parser.add_argument("--disable-tags-escaping", action="store_true",
+                        help="Disable escaping of tag characters '<' and '>'. Use this if the text content of "
+                             "generated HTML presents formatting issues. Default is false.")
     args = parser.parse_args()
 
-    combine_allure(args.folder.rstrip(sep), args.dest, args.remove_temp_files, args.auto_create_folders, args.ignore_utf8_errors)
+    combine_allure(args.folder.rstrip(sep), args.dest, args.remove_temp_files, args.auto_create_folders, args.ignore_utf8_errors, args.disable_tags_escaping)
 
 
 if __name__ == '__main__':

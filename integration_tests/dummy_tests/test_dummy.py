@@ -115,3 +115,34 @@ def test_cli_ignore_utf8_errors(generated_report, tmp_path):
     assert cmd_with_flag.returncode == 0, cmd_with_flag.stdout + cmd_with_flag.stderr
     assert "Error on reading file" not in (cmd_with_flag.stdout + cmd_with_flag.stderr)
     assert (source_with_flag / "complete.html").exists()
+
+
+def test_cli_disable_tags_escaping(generated_report, tmp_path):
+    source_default = _copy_report(generated_report, tmp_path / "default")
+    source_disabled = _copy_report(generated_report, tmp_path / "disabled")
+
+    # Create a file with HTML tags
+    html_content = "<script>alert('xss')</script>"
+    (source_default / "data" / "test.html").parent.mkdir(parents=True, exist_ok=True)
+    (source_default / "data" / "test.txt").write_text(html_content, encoding="utf-8")
+    
+    (source_disabled / "data" / "test.html").parent.mkdir(parents=True, exist_ok=True)
+    (source_disabled / "data" / "test.txt").write_text(html_content, encoding="utf-8")
+
+    # Run without flag (default behavior: escaping enabled)
+    cmd_default = _run(["allure-combine", str(source_default)])
+    assert cmd_default.returncode == 0, cmd_default.stdout + cmd_default.stderr
+    
+    content_default = (source_default / "complete.html").read_text(encoding="utf-8")
+    # Should be escaped
+    assert "&lt;script&gt;alert('xss')&lt;/script&gt;" in content_default
+    assert "<script>alert('xss')</script>" not in content_default
+
+    # Run with flag (escaping disabled)
+    cmd_disabled = _run(["allure-combine", str(source_disabled), "--disable-tags-escaping"])
+    assert cmd_disabled.returncode == 0, cmd_disabled.stdout + cmd_disabled.stderr
+    
+    content_disabled = (source_disabled / "complete.html").read_text(encoding="utf-8")
+    # Should NOT be escaped
+    assert r"\u003cscript\u003ealert('xss')\u003c/script\u003e" in content_disabled
+    assert "&lt;script&gt;alert('xss')&lt;/script&gt;" not in content_disabled
