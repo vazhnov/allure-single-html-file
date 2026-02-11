@@ -121,6 +121,34 @@ combine_allure(
 
 ```
 
+## Integration tests
+
+The repository contains Docker-based integration tests in `integration_tests/` that validate `allure-combine` CLI flows (including `--dest`, `--auto-create-folders`, `--remove-temp-files`, and `--ignore-utf8-errors`).
+
+Run full integration flow (requires Docker): build image, run tests, generate `complete.html` for each CLI variant, and validate every generated HTML in headless Chromium via Playwright.
+
+```bash
+./run_integration_tests.sh
+```
+
+Optional environment variables:
+
+```bash
+IMAGE_TAG=my-allure-itests:dev ./run_integration_tests.sh
+ARTIFACTS_DIR=./tmp/allure-itests ./run_integration_tests.sh
+RUN_PLAYWRIGHT_VALIDATION=0 ./run_integration_tests.sh
+PLAYWRIGHT_IMAGE=mcr.microsoft.com/playwright:v1.56.1-noble ./run_integration_tests.sh
+PLAYWRIGHT_VERSION=1.56.1 ./run_integration_tests.sh
+```
+
+Validate an existing HTML report directly with Playwright:
+
+```bash
+./validate_html_with_playwright.sh ./integration_tests/artifacts/complete.html
+```
+
+By default, generated reports are stored under `integration_tests/artifacts/` and variants under `integration_tests/artifacts/variants/`.
+
 ## TODO
 
 * Functionality to open image or video in new browser tab doesn't work yet.
