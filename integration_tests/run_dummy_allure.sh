@@ -64,5 +64,12 @@ allure-combine "${ignore_src}" --ignore-utf8-errors
 mkdir -p "${VARIANTS_DIR}/ignore-utf8-errors"
 cp "${ignore_src}/complete.html" "${VARIANTS_DIR}/ignore-utf8-errors/complete.html"
 
+# --disable-tags-escaping
+disable_tags_src="$(copy_source_report disable-tags-escaping)"
+allure-combine "${disable_tags_src}" --disable-tags-escaping
+mkdir -p "${VARIANTS_DIR}/disable-tags-escaping"
+cp "${disable_tags_src}/complete.html" "${VARIANTS_DIR}/disable-tags-escaping/complete.html"
+test -f "${VARIANTS_DIR}/disable-tags-escaping/complete.html"
+
 echo "Generated variant HTML reports:"
 find "${VARIANTS_DIR}" -name 'complete.html' -type f | sort
