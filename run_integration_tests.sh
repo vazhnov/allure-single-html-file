@@ -15,7 +15,7 @@ else
 fi
 
 mkdir -p "${ARTIFACTS_PATH}"
-rm -rf "${ARTIFACTS_PATH:?}/"*
+docker run --rm -v "${ARTIFACTS_PATH}:/work" alpine sh -c 'rm -rf /work/* || true'
 
 docker build -f integration_tests/Dockerfile -t "${IMAGE_TAG}" .
 docker run --rm \
